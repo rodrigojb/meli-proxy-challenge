@@ -1,0 +1,81 @@
+version: "3.8"
+services:
+  meli-proxy_lb:
+    build:
+      context: ./nginx
+    ports:
+      - 8080:80
+
+  meli-proxy_1:
+    build:
+      context: ./meli-proxy
+    ports:
+      - 8081:8080
+
+  meli-proxy_2:
+    build:
+      context: ./meli-proxy
+    ports:
+      - 8082:8080
+
+  meli-proxy_3:
+    build:
+      context: ./meli-proxy
+    ports:
+      - 8083:8080
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - 6379:6379
+
+  redisinsight:
+    image: redislabs/redisinsight:1.11.1
+    ports:
+      - 8001:8001
+
+  prometheus:
+    image: prom/prometheus:v2.24.0
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana:8.4.4
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+
+  locust-master:
+    image: locustio/locust:2.8.3
+    ports:
+      - 8089:8089
+    volumes:
+      - ./locust/:/mnt/locust
+    command: --master -f /mnt/locust/locustfile.py
+
+  locust-worker_1:
+    image: locustio/locust:2.8.3
+    volumes:
+      - ./locust/:/mnt/locust
+    command: --worker -f /mnt/locust/locustfile.py --master-host locust-master
+
+  locust-worker_2:
+    image: locustio/locust:2.8.3
+    volumes:
+      - ./locust/:/mnt/locust
+    command: --worker -f /mnt/locust/locustfile.py --master-host locust-master
+
+  locust-worker_3:
+    image: locustio/locust:2.8.3
+    volumes:
+      - ./locust/:/mnt/locust
+    command: --worker -f /mnt/locust/locustfile.py --master-host locust-master
