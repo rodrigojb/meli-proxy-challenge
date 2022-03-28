@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: meli-proxy
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - meli-proxy_1:8080
+          - meli-proxy_2:8080
+          - meli-proxy_3:8080
