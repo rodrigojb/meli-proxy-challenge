@@ -1,0 +1,11 @@
+apiVersion: 1
+
+datasources:
+  - name: prometheus-meli-proxy
+    type: prometheus
+    orgId: 1
+    url: http://prometheus:9090
+    isDefault: true
+    basicAuth: false
+    version: 1
+    editable: true
